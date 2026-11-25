@@ -1,0 +1,488 @@
+/*
+ * barry-voting-screen. Layout is in stage pixels (1080×1920), measured from
+ * design/renders/ (1080 px wide, 2:3) with the extra ~300 px given to the
+ * dinosaur area (Home, Keyboard) and to spacing (Results).
+ * Motion uses transform and opacity only (README performance rules).
+ */
+
+/* Fira Sans (SIL OFL, see fonts/OFL.txt), a stand-in for the design's Myriad.
+   Referenced relatively so the player build inlines it. */
+@font-face {
+  font-family: "Kiosk Sans";
+  src: url("./fonts/FiraSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: block;
+}
+@font-face {
+  font-family: "Kiosk Sans";
+  src: url("./fonts/FiraSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: block;
+}
+
+/* Design tokens (README, sampled at 1080 px wide). */
+:root {
+  --strike: #7257a9;
+  --signal: #576ea9;
+  --touch: #5790a9;
+  --white: #ffffff; /* image area */
+  --slate: #617784; /* Home panel */
+  --slate-line: #80939f;
+  --navy: #012f47; /* Results background */
+  --navy-line: #235169;
+  --ink: #01243a; /* Keyboard background, legend text */
+  --ink-line: #17374c; /* measured from render 3 */
+  --band: #395465; /* Keyboard upper band */
+  --band-line: #476273; /* measured from render 3 */
+  --pale: #c2d2d8; /* borders, pie ring, divider */
+  --fill-home: rgba(255, 255, 255, 0.17); /* Home buttons */
+  --fill-btn: rgba(255, 255, 255, 0.12); /* Results button, keys */
+  --grid-step: 98.5px;
+  --grid-w: 4px;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000; /* only visible around the stage when it's scaled */
+}
+
+/* Kiosk guards: the app handles every gesture itself. */
+html,
+body,
+#stage {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  transform-origin: 0 0;
+  background: var(--white);
+  color: #fff;
+  font-family: "Kiosk Sans", sans-serif;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+/* ---------- Screens (screens.js) ----------
+   Opaque and full-stage. The entering screen fades in above the leaving one. */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  visibility: hidden;
+  background: var(--white);
+}
+.screen.is-active {
+  visibility: visible;
+  z-index: 2;
+}
+.screen.is-leaving {
+  visibility: visible;
+  z-index: 1;
+}
+
+/* White image area. The dinosaur sits at the same spot on every screen, so it
+   stays put through each crossfade (faded on Results). */
+.art {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1043px; /* design 793 + 250 */
+  overflow: hidden;
+  background: var(--white);
+}
+.barry {
+  position: absolute;
+  left: 0;
+  top: 138px; /* centered in the 1043 px area */
+  width: 1080px;
+  height: 767px;
+}
+.barry-faded {
+  opacity: 0.15;
+}
+
+.panel {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+}
+
+/* Grid rebuilt in CSS: --grid-w lines every --grid-step; --gx/--gy set where
+   the first line falls, matching the renders. Painted once, never animated. */
+.grid {
+  background-color: var(--grid-bg);
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0 var(--gx),
+      var(--grid-line) var(--gx) calc(var(--gx) + var(--grid-w)),
+      transparent calc(var(--gx) + var(--grid-w)) var(--grid-step)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 var(--gy),
+      var(--grid-line) var(--gy) calc(var(--gy) + var(--grid-w)),
+      transparent calc(var(--gy) + var(--grid-w)) var(--grid-step)
+    );
+}
+.grid-slate {
+  --grid-bg: var(--slate);
+  --grid-line: var(--slate-line);
+  --gx: 56px;
+  --gy: 54px;
+}
+.grid-navy {
+  --grid-bg: var(--navy);
+  --grid-line: var(--navy-line);
+  --gx: 51px;
+  --gy: 0px;
+}
+.grid-band {
+  --grid-bg: var(--band);
+  --grid-line: var(--band-line);
+  --gx: 24px;
+  --gy: 56px;
+}
+.grid-ink {
+  --grid-bg: var(--ink);
+  --grid-line: var(--ink-line);
+  --gx: 24px;
+  --gy: 40px;
+}
+
+/* ---------- Buttons ----------
+   The [data-tap] element is the hit area; its .face is what you see and what
+   the pressed state moves. Instant on press; eases back on release. */
+.face {
+  transition:
+    transform 160ms ease-out,
+    opacity 160ms ease-out;
+}
+.is-pressed > .face {
+  transform: scale(0.95);
+  opacity: 0.85;
+  transition: none;
+}
+
+/* Outlined bar button (Results "Submit your own theory", Keyboard "Back"). */
+.btn {
+  position: absolute;
+  left: 94px;
+  width: 887px;
+  height: 120px;
+}
+.btn .face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+  border: 5px solid var(--pale);
+  border-radius: 40px;
+  background: var(--fill-btn);
+  font-size: 54px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---------- Home (Screen 1) ---------- */
+.screen-home .panel {
+  top: 1043px;
+  height: 877px;
+}
+
+/* Design: Myriad 120 px. Fira Sans is wider, so 88 px is the largest that fits. */
+.headline {
+  position: absolute;
+  left: 90px;
+  top: 95px;
+  margin: 0;
+  font-size: 88px;
+  font-weight: 400;
+  line-height: 1.146;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.headline b {
+  font-weight: 700;
+}
+
+/* Design: 2 lines at 42.5 px. In Fira Sans, 40 px is the largest that fits in
+   3 lines (42 px needs 4); the box has slack so it can't tip into a 4th line,
+   and balance evens the lines out. */
+.intro {
+  position: absolute;
+  left: 90px;
+  top: 341px;
+  width: 920px;
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+
+.votes {
+  position: absolute;
+  left: 94px;
+  top: 597px;
+  display: flex;
+  gap: 40px;
+}
+.vote {
+  width: 269px;
+  height: 193px;
+}
+.vote .face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 20px;
+  border-radius: 40px;
+  background: var(--fill-home);
+  font-size: 65px;
+  line-height: 0.92;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Attract motion: a slow pulse that ripples across the buttons, then rests.
+   Runs only while Home is on screen. */
+.screen-home.is-active .vote,
+.screen-home.is-leaving .vote {
+  animation: attract 6s ease-in-out calc(var(--i) * 0.4s) infinite;
+}
+@keyframes attract {
+  0%,
+  24%,
+  100% {
+    transform: none;
+  }
+  12% {
+    transform: scale(1.045);
+  }
+}
+
+/* ---------- Results (Screen 2) ---------- */
+.screen-results .art {
+  height: 620px; /* design 525 + 95 */
+}
+.screen-results .panel {
+  top: 620px;
+  height: 1300px;
+}
+
+/* Legend: baselines at 195, 345, 495 (150 px rows). */
+.legend {
+  position: absolute;
+  left: 140px;
+  top: 98px;
+  width: 800px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink);
+  font-size: 65px;
+  line-height: 150px;
+  text-transform: uppercase;
+}
+.legend-row {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: baseline;
+  height: 150px;
+}
+/* The visitor's choice: a band tinted with its color, and bold text. */
+.legend-row::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -30px;
+  right: -30px;
+  top: 24px;
+  height: 100px;
+  border-radius: 20px;
+  background: var(--c);
+  opacity: 0;
+}
+.legend-row.is-chosen::before {
+  opacity: 0.16;
+}
+.legend-row.is-chosen .legend-label,
+.legend-row.is-chosen .legend-pct {
+  font-weight: 700;
+}
+.swatch {
+  flex: none;
+  width: 40px;
+  height: 40px; /* no baseline of its own, so its bottom sits on the text baseline */
+  margin-right: 40px;
+  background: var(--c);
+}
+.legend-label {
+  white-space: nowrap;
+}
+.leader {
+  flex: 1;
+  height: 6px; /* bottom on the baseline, like a row of periods */
+  margin: 0 12px;
+  background: radial-gradient(circle, var(--ink) 2.5px, transparent 3px) 0 0 / 12px 6px repeat-x;
+}
+.legend-pct {
+  flex: none;
+  width: 170px; /* fits "100%" in bold, so every leader ends at the same x */
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pie: 820 px box centered on the ring (stage 540, 1135). The ring is r 387,
+   10 px wide, drawn over slices that fill it (results.js). Revealed with
+   opacity + scale. */
+.pie {
+  position: absolute;
+  left: 130px;
+  top: 105px;
+  width: 820px;
+  height: 820px;
+}
+.pie svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.pie-ring {
+  fill: none;
+  stroke: var(--pale);
+  stroke-width: 10;
+}
+/* Separators: one navy line per slice boundary, all the same width. */
+.pie-line {
+  stroke: var(--navy);
+  stroke-width: 4;
+}
+.pie.is-empty .pie-slices,
+.pie.is-empty .pie-lines {
+  display: none;
+}
+.pie-empty {
+  display: none;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0 160px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.pie.is-empty .pie-empty {
+  display: flex;
+}
+
+.btn-theory {
+  top: 1025px; /* stage 1645 */
+}
+
+/* ---------- Keyboard (Screen 3): phase 1 placeholder ---------- */
+.screen-keyboard .grid-band {
+  top: 1043px;
+  height: 207px;
+  border-bottom: 4px solid var(--pale);
+}
+.screen-keyboard .grid-ink {
+  top: 1254px;
+  height: 666px;
+}
+.field {
+  position: absolute;
+  left: 30px;
+  top: 40px;
+  width: 1020px;
+  height: 147px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 40px;
+  background: var(--white);
+  color: #7d8c95;
+  font-size: 44px;
+}
+.btn-back {
+  top: 92px;
+}
+
+/* ---------- Diagnostics ---------- */
+
+/* Debug overlay (debug.js), top right. */
+.debug {
+  position: absolute;
+  z-index: 10;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 10px 10px 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.debug-text {
+  white-space: pre;
+}
+.debug-reset .face {
+  padding: 18px 20px;
+  border-radius: 10px;
+  background: #b3261e;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* On-screen errors (errors.js), below the debug overlay. */
+.errors {
+  position: absolute;
+  z-index: 20;
+  left: 40px;
+  right: 40px;
+  top: 140px;
+  box-sizing: border-box;
+  padding: 14px 20px;
+  max-height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(110, 16, 16, 0.92);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}

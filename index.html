@@ -2,12 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>barry-voting-screen</title>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <!-- Fixed 1080×1920 portrait stage; src/stage.js scales it only when the window is another size.
+         One section per state (src/state.js). Images get their src in src/main.js. -->
+    <div id="stage">
+      <!-- Home (design Screen 1) -->
+      <section class="screen screen-home is-active" data-screen="home">
+        <div class="art"><img class="barry" alt="" draggable="false" /></div>
+        <div class="panel grid grid-slate">
+          <h1 class="headline">We learn <b>more</b> when<br />we learn <b>together</b></h1>
+          <p class="intro">
+            It took an entire community to bring Barry to life. Join the project by sharing your
+            conclusions! Do you think Barry used his tail to...
+          </p>
+          <div class="votes" id="vote-buttons"></div>
+        </div>
+      </section>
+
+      <!-- Results (design Screen 2). Legend rows and pie slices are built in src/results.js. -->
+      <section class="screen screen-results" data-screen="results">
+        <div class="art"><img class="barry barry-faded" alt="" draggable="false" /></div>
+        <ul class="legend" id="legend"></ul>
+        <div class="panel grid grid-navy">
+          <div class="pie" id="pie">
+            <svg viewBox="-410 -410 820 820" aria-hidden="true">
+              <g class="pie-slices"></g>
+              <g class="pie-lines"></g>
+              <circle class="pie-ring" r="387" />
+            </svg>
+            <p class="pie-empty">Be the first to vote!</p>
+          </div>
+          <div class="btn btn-theory" data-tap="theory">
+            <div class="face">Submit your own theory here!</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Keyboard (design Screen 3): placeholder until phase 2. -->
+      <section class="screen screen-keyboard" data-screen="keyboard">
+        <div class="art"><img class="barry" alt="" draggable="false" /></div>
+        <div class="panel grid grid-band">
+          <div class="field">The keyboard arrives in phase 2</div>
+        </div>
+        <div class="panel grid grid-ink">
+          <div class="btn btn-back" data-tap="back"><div class="face">Back</div></div>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

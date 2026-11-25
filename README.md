@@ -9,7 +9,7 @@ Plain JavaScript (no framework). Vite is used only as a dev server and packager.
 | Screen                       | What the visitor sees                                                              | Leaves when                            | Goes to                          |
 | ---------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------- | -------------------------------- |
 | Home (design Screen 1)       | The question and three vote buttons                                                | A vote button is tapped                | Results                          |
-| Results (Screen 2)           | Today's totals as a pie chart, their choice highlighted, percentages in the legend | 15 s pass, or a tap outside the button | Home                             |
+| Results (Screen 2)           | Today's totals as a pie chart, their choice highlighted, percentages in the legend | 25 s pass, or a tap outside the button | Home                             |
 |                              |                                                                                    | "Submit your own theory" is tapped     | Keyboard                         |
 | Keyboard (Screen 3, phase 2) | Text field and on-screen keyboard                                                  | Submit                                 | Thank-you (about 3 s), then Home |
 |                              |                                                                                    | 45 s with no key press                 | Home, text cleared               |
@@ -65,8 +65,21 @@ barry-voting-screen/
 ├── scripts/
 │   └── extract-design.sh
 ├── src/
-│   └── fonts/        bundled font files and their license
-├── index.html
+│   ├── fonts/        bundled font files and their license
+│   ├── config.js     every tunable value: DEBUG, options, idle timeouts, fade and pie timing, tap slop
+│   ├── main.js       boot and wiring: taps -> state events, state changes -> screens, idle, votes
+│   ├── state.js      the visitor flow as one transition table (home, results, keyboard, thanks)
+│   ├── votes.js      vote counts in localStorage: load(), record(), totals(), reset()
+│   ├── screens.js    crossfade between screens; taps are ignored until it ends
+│   ├── home.js       vote buttons
+│   ├── results.js    legend, pie and largest-remainder percentages
+│   ├── stage.js      1080×1920 stage, desktop-preview scaling, pointer -> stage coords
+│   ├── input.js      pointer handling: press, tap, kiosk guards
+│   ├── idle.js       the one idle timer
+│   ├── debug.js      FPS overlay and "reset votes"
+│   ├── errors.js     on-screen error display
+│   └── style.css     design tokens and layout
+├── index.html        one section per screen
 └── vite.config.js
 ```
 
