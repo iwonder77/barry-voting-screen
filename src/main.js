@@ -10,6 +10,7 @@ import * as votes from "./votes.js";
 import { initScreens, showScreen, isFading } from "./screens.js";
 import { buildVoteButtons } from "./home.js";
 import { initResults, renderResults, revealPie } from "./results.js";
+import { initKeyboard, pressKey, resetKeyboard } from "./keyboard.js";
 import { armIdle, noteActivity, idleLeft } from "./idle.js";
 import { startDebug } from "./debug.js";
 
@@ -27,6 +28,7 @@ function boot() {
   for (const img of stage.querySelectorAll("img.barry")) img.src = IMAGE_BARRY;
   buildVoteButtons(document.getElementById("vote-buttons"));
   initResults(document.getElementById("legend"), document.getElementById("pie"));
+  initKeyboard(stage.querySelector(".screen-keyboard"), () => flow.send("submit"));
   initScreens(stage);
   votes.load();
 
@@ -43,6 +45,9 @@ function enter(to, from, event, data) {
       votes.record(choice);
     }
     if (to === "home") choice = null;
+    // Typed text never outlives a visit: cleared on the way in and on the way
+    // out (submit or the 45 s timeout).
+    if (to === "keyboard" || from === "keyboard") resetKeyboard();
     if (to === "results") {
       renderResults(votes.totals(), choice);
       revealPie();
@@ -61,11 +66,13 @@ function canPress(el) {
   return (el && el.dataset.tap === "reset-votes") || !isFading();
 }
 
-// data-tap values are flow events, except "reset-votes". A tap on no button is
-// "dismiss" (Results -> Home); states that don't list an event ignore it.
+// data-tap values are flow events, except "key" (keyboard keys and the Submit
+// bar; keyboard.js sends "submit" itself) and "reset-votes". A tap on no button
+// is "dismiss" (Results -> Home); states that don't list an event ignore it.
 function onTap(el) {
   const action = el ? el.dataset.tap : "dismiss";
   if (action === "reset-votes") resetVotes();
+  else if (action === "key") pressKey(el);
   else if (action === "vote") flow.send("vote", el.dataset.option);
   else flow.send(action);
 }

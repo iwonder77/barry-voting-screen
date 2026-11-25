@@ -73,6 +73,8 @@ barry-voting-screen/
 │   ├── screens.js    crossfade between screens; taps are ignored until it ends
 │   ├── home.js       vote buttons
 │   ├── results.js    legend, pie and largest-remainder percentages
+│   ├── keyboard.js   text field and on-screen keyboard: typing, Shift, Caps Lock, layers, submit
+│   ├── keyboard-layout.js  the keyboard's keys, as one array of rows per layer
 │   ├── stage.js      1080×1920 stage, desktop-preview scaling, pointer -> stage coords
 │   ├── input.js      pointer handling: press, tap, kiosk guards
 │   ├── idle.js       the one idle timer

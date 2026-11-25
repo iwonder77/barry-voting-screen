@@ -29,6 +29,11 @@ export const FADE_MS = 400;
 export const PIE_DELAY_MS = 150;
 export const PIE_MS = 500;
 
+// Keyboard: the most characters a theory can have, and from how many typed
+// characters on the field shows "N characters left".
+export const TEXT_LIMIT = 140;
+export const COUNT_FROM = 120;
+
 // Input
 export const TAP_SLOP = 24; // a press may drift this far outside its button (or from its start) and still be a tap
 export const STUCK_POINTER_MS = 5000; // a silent press this old is treated as lost (its pointerup never came)

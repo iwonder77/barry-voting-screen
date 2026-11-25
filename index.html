@@ -41,14 +41,28 @@
         </div>
       </section>
 
-      <!-- Keyboard (design Screen 3): placeholder until phase 2. -->
+      <!-- Keyboard (design Screen 3). Keys are built in src/keyboard.js from src/keyboard-layout.js. -->
       <section class="screen screen-keyboard" data-screen="keyboard">
         <div class="art"><img class="barry" alt="" draggable="false" /></div>
         <div class="panel grid grid-band">
-          <div class="field">The keyboard arrives in phase 2</div>
+          <div class="kb-count is-hidden"></div>
+          <div class="field">
+            <div class="field-text"><span class="typed"></span><span class="caret"></span></div>
+          </div>
         </div>
         <div class="panel grid grid-ink">
-          <div class="btn btn-back" data-tap="back"><div class="face">Back</div></div>
+          <div class="btn btn-submit" data-tap="key" data-action="submit">
+            <div class="face">Submit theory</div>
+          </div>
+          <div class="kb"></div>
+        </div>
+      </section>
+
+      <!-- Thank-you, after a theory is submitted (no design yet; wording is a placeholder). -->
+      <section class="screen screen-thanks" data-screen="thanks">
+        <div class="art"><img class="barry" alt="" draggable="false" /></div>
+        <div class="panel grid grid-ink">
+          <p class="thanks">Thanks for sharing<br /><b>your theory!</b></p>
         </div>
       </section>
     </div>

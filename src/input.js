@@ -6,6 +6,9 @@
 // .is-pressed; drifting more than TAP_SLOP outside the element cancels it, and
 // releasing inside it is a tap. A press anywhere else is a background tap
 // (onTap(null)) if it stays within TAP_SLOP of where it started.
+// Keyboard keys are marked [data-rollover]: when a second finger comes down
+// while one is pressed, that key is committed as a tap and the new finger
+// takes over, so quick typing doesn't drop keys.
 import { TAP_SLOP, STUCK_POINTER_MS } from "./config.js";
 import { toStage } from "./stage.js";
 import { reportError } from "./errors.js";
@@ -62,8 +65,9 @@ function onDown(e) {
     // same id again, the browser says no other pointer is down (isPrimary),
     // or it has been silent too long.
     const lost = e.pointerId === press.id || e.isPrimary || now - press.seen > STUCK_POINTER_MS;
-    if (!lost) return;
-    cancelPress();
+    if (lost) cancelPress();
+    else if (press.el && press.el.dataset.rollover !== undefined) commitPress();
+    else return;
   }
 
   const el = e.target instanceof Element ? e.target.closest("[data-tap]") : null;
@@ -95,6 +99,13 @@ function onUp(e) {
   const el = press.el;
   cancelPress();
   if (tap) h.onTap(el);
+}
+
+// Ends the current press as a tap, if it still counts as one (rollover).
+function commitPress() {
+  const { el, ok } = press;
+  cancelPress();
+  if (ok) h.onTap(el);
 }
 
 function onCancel(e) {

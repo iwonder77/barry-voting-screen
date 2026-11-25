@@ -37,6 +37,7 @@
   --pale: #c2d2d8; /* borders, pie ring, divider */
   --fill-home: rgba(255, 255, 255, 0.17); /* Home buttons */
   --fill-btn: rgba(255, 255, 255, 0.12); /* Results button, keys */
+  --fill-submit: rgba(255, 255, 255, 0.29); /* Keyboard submit bar */
   --grid-step: 98.5px;
   --grid-w: 4px;
 }
@@ -408,32 +409,175 @@ img {
   top: 1025px; /* stage 1645 */
 }
 
-/* ---------- Keyboard (Screen 3): phase 1 placeholder ---------- */
+/* ---------- Keyboard (Screen 3) ----------
+   Band 1043–1278 (design 207 px, +28 so the field holds 3 lines), divider,
+   keyboard area 1282–1920. Keys are 70×76 (design 67×65) with 14 px gaps. */
 .screen-keyboard .grid-band {
   top: 1043px;
-  height: 207px;
+  height: 235px;
   border-bottom: 4px solid var(--pale);
 }
 .screen-keyboard .grid-ink {
-  top: 1254px;
-  height: 666px;
+  top: 1282px;
+  height: 638px;
 }
+
+/* Shown from COUNT_FROM characters (config.js), above the field's right end. */
+.kb-count {
+  position: absolute;
+  right: 40px;
+  top: 4px;
+  color: var(--pale);
+  font-size: 24px;
+  line-height: 32px;
+}
+.kb-count.is-hidden {
+  visibility: hidden;
+}
+
 .field {
   position: absolute;
   left: 30px;
   top: 40px;
   width: 1020px;
-  height: 147px;
+  height: 174px;
+  box-sizing: border-box;
+  padding: 18px 30px;
+  border-radius: 40px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 36px;
+  line-height: 46px;
+}
+/* Exactly 3 lines; keyboard.js scrolls it so the newest line is always shown. */
+.field-text {
+  height: 138px;
+  overflow: hidden;
+  white-space: pre-wrap; /* keep typed spaces */
+  overflow-wrap: anywhere; /* long unbroken words still wrap */
+}
+.caret {
+  display: inline-block;
+  width: 3px;
+  height: 42px;
+  margin-left: 1px;
+  vertical-align: -9px;
+  background: var(--ink);
+}
+.screen-keyboard.is-active .caret {
+  animation: caret-blink 1.1s step-end infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.btn-submit {
+  left: 32px;
+  top: 70px; /* stage 1352 */
+  width: 1016px;
+  height: 110px;
+}
+.btn-submit .face {
+  background: var(--fill-submit);
+  font-size: 65px;
+}
+/* Nothing typed yet: Submit and Return look unavailable (and do nothing). */
+.screen-keyboard.is-empty .btn-submit,
+.screen-keyboard.is-empty .key-submit {
+  opacity: 0.45;
+}
+
+.kb {
+  position: absolute;
+  left: 30px;
+  top: 216px; /* stage 1498; rows end at 1844 */
+  width: 1020px;
+}
+.kb-layer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.kb-layer.is-hidden {
+  display: none;
+}
+.kb-row {
+  display: flex;
+  gap: 14px;
+  height: 76px;
+}
+/* Character keys are 70 px; function keys, gaps and the space bar get an
+   inline `flex` from keyboard.js and share the rest of the row. */
+.key {
+  flex: none;
+  width: 70px;
+}
+.key .face {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 40px;
-  background: var(--white);
-  color: #7d8c95;
-  font-size: 44px;
+  height: 100%;
+  box-sizing: border-box;
+  border: 2px solid var(--pale);
+  border-radius: 15px;
+  background: var(--fill-btn);
+  font-size: 40px;
 }
-.btn-back {
-  top: 92px;
+.kb.is-upper .key-letter .face {
+  text-transform: uppercase;
+}
+/* Function keys: small label in the bottom corner, as in the render. */
+.key-fn .face {
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 12px 10px;
+  font-size: 22px;
+  white-space: nowrap;
+}
+.key-fn.key-right .face {
+  justify-content: flex-end;
+}
+/* Shift or Caps Lock on. */
+.key-fn.is-on .face {
+  background: var(--pale);
+  color: var(--ink);
+}
+/* "," with "?" above it, "." with "!": the upper one is typed with Shift. */
+.key-dual .face {
+  flex-direction: column;
+  font-size: 32px;
+  line-height: 0.9;
+}
+.key-alt {
+  opacity: 0.5;
+}
+.kb.is-shift .key-alt {
+  opacity: 1;
+}
+.kb.is-shift .key-dual .face > :last-child {
+  opacity: 0.5;
+}
+
+/* ---------- Thank-you (no design yet) ---------- */
+.screen-thanks .panel {
+  top: 1043px;
+  height: 877px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.thanks {
+  margin: 0;
+  text-align: center;
+  font-size: 88px;
+  line-height: 1.146;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+}
+.thanks b {
+  font-weight: 700;
 }
 
 /* ---------- Diagnostics ---------- */

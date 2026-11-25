@@ -4,7 +4,7 @@
 const FLOW = {
   home: { vote: "results" },
   results: { theory: "keyboard", dismiss: "home", idle: "home" },
-  keyboard: { back: "results", submit: "thanks", idle: "home" }, // back: phase 1 placeholder only
+  keyboard: { submit: "thanks", idle: "home" },
   thanks: { idle: "home" },
 };
 
