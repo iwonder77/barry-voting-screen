@@ -422,6 +422,32 @@ img {
   height: 638px;
 }
 
+/* Close: back to Home, discarding the text. Just above the keyboard panel's
+   right end: within reach on the tall screen, and far from Submit. */
+.btn-close {
+  position: absolute;
+  right: 30px;
+  top: 935px; /* 20 px above the band */
+  width: 220px;
+  height: 88px;
+}
+.btn-close .face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  border-radius: 44px;
+  background: var(--ink);
+  font-size: 40px;
+  text-transform: uppercase;
+}
+.close-x {
+  font-size: 52px;
+  line-height: 1;
+  margin-top: -4px; /* optically centered with the caps */
+}
+
 /* Shown from COUNT_FROM characters (config.js), above the field's right end. */
 .kb-count {
   position: absolute;

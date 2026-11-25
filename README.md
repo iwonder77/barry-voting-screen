@@ -12,7 +12,8 @@ Plain JavaScript (no framework). Vite is used only as a dev server and packager.
 | Results (Screen 2)           | Today's totals as a pie chart, their choice highlighted, percentages in the legend | 25 s pass, or a tap outside the button | Home                             |
 |                              |                                                                                    | "Submit your own theory" is tapped     | Keyboard                         |
 | Keyboard (Screen 3, phase 2) | Text field and on-screen keyboard                                                  | Submit                                 | Thank-you (about 3 s), then Home |
-|                              |                                                                                    | 45 s with no key press                 | Home, text cleared               |
+|                              |                                                                                    | "Close" is tapped                      | Home, text cleared               |
+|                              |                                                                                    | 25 s with no key press                 | Home, text cleared               |
 
 Home doubles as the attract state. Showing Results after each vote limits each visitor to one vote per visit.
 

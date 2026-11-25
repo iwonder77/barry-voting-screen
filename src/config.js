@@ -19,8 +19,10 @@ export const OPTIONS = [
 ];
 
 // Idle timeout per state; each one returns to Home. 0 = no timeout.
-// Results was 15 s in the original spec; lengthened after testing.
-export const IDLE_MS = { home: 0, results: 25000, keyboard: 45000, thanks: 3000 };
+// Results and Keyboard share SCREEN_TIMEOUT_MS (the original spec had 15 s
+// and 45 s; lengthened/shortened after testing on the player).
+export const SCREEN_TIMEOUT_MS = 25000;
+export const IDLE_MS = { home: 0, results: SCREEN_TIMEOUT_MS, keyboard: SCREEN_TIMEOUT_MS, thanks: 3000 };
 
 // Screen crossfade. Taps that start during it are ignored.
 export const FADE_MS = 400;
